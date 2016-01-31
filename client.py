@@ -12,7 +12,7 @@ python client.py --verbose --port 12345 --host 127.0.0.1 --output-file out --inp
 
 
 class Client:
-    def __init__(self, ip_address, port, log, output_file, input_file, block_size=1024 * 4):
+    def __init__(self, ip_address, port, log, output_file, input_file, block_size):
         self.log = log
         self.ip_address = ip_address
         self.port = port
@@ -41,7 +41,7 @@ class Client:
             data = input_fd.read()
 
         if data:
-            #self.socket.send(data + END_SEQUENCE)
+            # self.socket.send(data + END_SEQUENCE)
             self.socket.send(data)
             self.socket.send(END_SEQUENCE)
 
@@ -95,11 +95,16 @@ def main():
                         dest="in_file",
                         help="path of the input file, txt or 7z format",
                         required=True)
+    parser.add_argument("--block_size",
+                        dest="block_size",
+                        help="socket data size transmission",
+                        type=int,
+                        default=4096)
 
     args = parser.parse_args()
 
     log = get_log('Blueliv-Client', args.verbose)
-    client = Client(args.host, args.port, log, args.out_file, args.in_file)
+    client = Client(args.host, args.port, log, args.out_file, args.in_file, args.block_size)
     client.run()
 
 
