@@ -34,15 +34,19 @@ Usage:
 
    1) Demo mode: launcher.sh script will run service and client in localhost.
    2) Start service with default configuration ( to change them edit config.py ):
+
          > python service.py
 
       Run client:
+
          > python client.py --host host --port port --input-file inputfile [ 7z, txt ] --output-file outputfilename
 
    3) Run service with parameters:
+
          >  python service.py [ --verbose ] --host host --port port
 
       Run client
+
          > python client.py --host host --port port --input-file inputfile [ 7z, txt ] --output-file outputfilename
 
     To stop the server kill the process or Ctrl + C
