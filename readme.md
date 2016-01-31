@@ -1,4 +1,4 @@
-Blueliv test:
+Arithmetic Simple Service
 ---------------------------------------------------------------------------------
 
 * Develop a client which is able to send the information given at operations.7z
@@ -14,7 +14,5 @@ Blueliv test:
     ** Consider that operations should not be calculated using EVAL.
     ** Consider using logging instead of console prints
 
- Todo:
-   * format the response file
-   * options to chose response calculated result format, int or float, number of decimals
+
 
