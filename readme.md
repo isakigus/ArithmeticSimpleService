@@ -33,19 +33,20 @@ Dependencies:
 Usage:
 
    1) Demo mode: launcher.sh script will run service and client in localhost.
-   2) Start service with default configuration ( to change them edit config.py ):
+
+   2) Start service with default configuration ( to change them edit config.py ).
 
          > python service.py
 
-      Run client:
+      Run client.
 
          > python client.py --host host --port port --input-file inputfile [ 7z, txt ] --output-file outputfilename
 
-   3) Run service with parameters:
+   3) Run service with parameters.
 
          >  python service.py [ --verbose ] --host host --port port
 
-      Run client
+      Run client.
 
          > python client.py --host host --port port --input-file inputfile [ 7z, txt ] --output-file outputfilename
 
