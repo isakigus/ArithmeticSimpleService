@@ -25,12 +25,12 @@ class Processor:
         self.log.info('reading socket ...')
         self.data = self.socket.recv(self.block_size)
         no_chunks = 1
-        self.log.info(' ... chunck read ... %s' % no_chunks)
+        self.log.debug(' ... chunck read ... %s' % no_chunks)
 
         while self.data[-len(END_SEQUENCE):] != END_SEQUENCE:
             no_chunks += 1
             self.data += self.socket.recv(self.block_size)
-            self.log.info(' ... chunck read ... %s' % no_chunks)
+            self.log.debug(' ... chunck read ... %s' % no_chunks)
 
         self.data = self.data[:-len(END_SEQUENCE)]
         self.log.info(' *** end of reading ***')
@@ -64,7 +64,7 @@ class Processor:
         response = calulator.pool_processor(self.data)
         data_to_send = "\n".join(response)
 
-        self.log.debug(' * sever responding ...')
+        self.log.info(' * sever responding ...')
         self.socket.send(data_to_send + END_SEQUENCE)
 
     def do_job(self):

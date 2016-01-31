@@ -194,7 +194,7 @@ class ArithmecticPool:
             for p in ps:
                 if p[1].poll():
                     msg_in = p[1].recv()
-                    self.log.info(msg_in)
+                    self.log.debug(msg_in)
                     if msg_in.strip() == ArithmecticPool.TERMINATING_MSG:
                         self.no_childs -= 1
                         self.log.debug('process %s stopping , left running:%s' % (p[0], self.no_childs))

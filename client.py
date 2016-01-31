@@ -26,9 +26,9 @@ class Client:
         while True:
             try:
                 wait((n - 1) * 2)
-                self.log.debug('creating socket and connecting ... try #%s' % n)
+                self.log.info('creating socket and connecting ... try #%s' % n)
                 self.socket.connect((self.ip_address, self.port))
-                self.log.debug('socket connected to %s:%s' % (self.ip_address, self.port))
+                self.log.info('socket connected to %s:%s' % (self.ip_address, self.port))
                 break
             except Exception as ex:
                 self.log.critical(ex)
@@ -41,20 +41,22 @@ class Client:
             data = input_fd.read()
 
         if data:
+            self.log.info('sending data ...')
             # self.socket.send(data + END_SEQUENCE)
             self.socket.send(data)
             self.socket.send(END_SEQUENCE)
+            self.log.info('data sent')
 
     def get_response(self):
         self.log.info('reading socket ...')
         no_chunks = 1
         response = self.socket.recv(self.block_size)
-        self.log.info(' ... chunck read ... %s' % no_chunks)
+        self.log.debug(' ... chunck read ... %s' % no_chunks)
 
         while response[-len(END_SEQUENCE):] != END_SEQUENCE:
             no_chunks += 1
             response += self.socket.recv(self.block_size)
-            self.log.info(' ... chunck read ... %s' % no_chunks)
+            self.log.debug(' ... chunck read ... %s' % no_chunks)
 
         response = response[:-len(END_SEQUENCE)]
         self.log.info(' *** end of reading ***')
