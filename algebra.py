@@ -137,7 +137,6 @@ class ArithmeticOperator:
 
             # and we do the addition of all elemnts once
             # the associative terms have been calculated.
-
             reduction.append(total)
 
         return sum(reduction)
@@ -187,10 +186,8 @@ class ArithmecticPool:
                     self.log.debug(return_msg)
 
     def listener_loop(self, ps, q_out):
-        while True:
-            if not self.no_childs:
-                break
 
+        while self.no_childs:
             for p in ps:
                 if p[1].poll():
                     msg_in = p[1].recv()
@@ -203,7 +200,6 @@ class ArithmecticPool:
 
     def pool_processor(self, operations_data):
         process_list, output_queue = [], multiprocessing.Queue()
-        records_to_process = len(operations_data)
 
         for i in range(self.no_childs):
             parent_conn, child_conn = multiprocessing.Pipe()
@@ -235,15 +231,9 @@ class ArithmecticPool:
             process_tuple[1].send((ArithmecticPool.STOP_PILL, 0))
             self.log.debug('  -> stopping ... %s' % process_tuple[0])
 
-        while True:
-            items_processed = output_queue.qsize()
-            self.log.debug("  ***** %s %s %s ******" % (self.no_childs, items_processed, records_to_process))
-            if items_processed == records_to_process:
-                break
-
         results = []
 
-        while not output_queue.empty():
+        while len(results) != no_messages_sent:
             element = output_queue.get()
             results.append(element)
 
