@@ -27,8 +27,8 @@ Requirements:
 
 Dependencies:
 
+   python 2.7 installed
    see requirements file.
-
 
 Usage:
 

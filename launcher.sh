@@ -9,8 +9,8 @@ FILE_OUTPUT=operations_output.txt
 
 virtualenv pitagoras
 ./pitagoras/bin/pip install -r requirements
-
-./pitagoras/bin/python service.py --verbose --host $HOST --port $PORT &
+./pitagoras/bin/python service.py --host $HOST --port $PORT &
+#./pitagoras/bin/python service.py --verbose --host $HOST --port $PORT &
 
 # give time to the server to start
 sleep 5
