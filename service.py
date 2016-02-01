@@ -76,9 +76,10 @@ class Processor:
 
 
 class ArithmeticService:
-    def __init__(self, log, ip_address, port, no_sockets, block_size, messages_per_child):
+    def __init__(self, verbose, ip_address, port, no_sockets, block_size, messages_per_child):
+        self.verbose = verbose
         self.messages_per_child = messages_per_child
-        self.log = log
+        self.log = get_log('Blueliv-Server', self.verbose)
         self.ip_address = ip_address
         self.port = port
         self.block_size = block_size
@@ -90,8 +91,9 @@ class ArithmeticService:
         self.socket.bind((self.ip_address, self.port))
         self.socket.listen(self.no_sockets)
 
-    def launch_process_message(self, client_socket):
-        arithmetic_processor = Processor(client_socket, self.block_size, self.log, self.messages_per_child)
+    def launch_process_message(self, client_socket, address):
+        log = get_log('Blueliv-Server: conn [ %s:%s ]' % address, self.verbose)
+        arithmetic_processor = Processor(client_socket, self.block_size, log, self.messages_per_child)
         arithmetic_worker = multiprocessing.Process(target=arithmetic_processor.do_job)
         arithmetic_worker.start()
 
@@ -100,7 +102,7 @@ class ArithmeticService:
         while 1:
             (client_socket, address) = self.socket.accept()
             self.log.info('connetion accepetd %s' % str(address))
-            self.launch_process_message(client_socket)
+            self.launch_process_message(client_socket, address)
 
         self.log.info(' *** server stopped ***')
 
@@ -149,8 +151,7 @@ def main():
 
     host, port, no_sockets, block_size, messages_per_child = parse_defult_args(args)
 
-    log = get_log('Blueliv-Server', args.verbose)
-    server = ArithmeticService(log, host, port, no_sockets, block_size, messages_per_child)
+    server = ArithmeticService(args.verbose, host, port, no_sockets, block_size, messages_per_child)
 
     try:
         server.run()
