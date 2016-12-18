@@ -1,7 +1,7 @@
 Arithmetic Simple Service
----------------------------------------------------------------------------------
+-------------------------
 
-Requirements:
+**Requirements:**
 
 * Develop a client which is able to send the information given at operations.7z
 
@@ -25,12 +25,14 @@ Requirements:
 
     ** Consider using logging instead of console prints
 
-Dependencies:
+
+**Dependencies:**
 
    python 2.7 installed
    see requirements file.
 
-Usage:
+
+**Usage:**
 
    1) Demo mode: launcher.sh script will run service and client in localhost.
 
@@ -53,6 +55,23 @@ Usage:
     To stop the server kill the process or Ctrl + C
 
  Enjoy your calculus!
+
+
+**how to build docs:**
+
+  cd docs
+
+  sphinx-build -b html source html
+
+
+**how to run coverage:**
+
+  cd project root
+
+  nosetests tests --with-coverage --cover-html
+
+
+
 
 
 

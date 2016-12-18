@@ -1,0 +1,7 @@
+algebra module
+==============
+
+.. automodule:: algebra
+    :members:
+    :undoc-members:
+    :show-inheritance:

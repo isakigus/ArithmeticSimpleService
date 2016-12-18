@@ -1,94 +1,49 @@
+"""
+This module contains the class ArithmeticOperator and ArithmeticPool
+"""
 import multiprocessing
-import unittest
-
-
-class ArithmeticOperatorValidationTest(unittest.TestCase):
-    def validate(self, operation):
-        return ArithmeticOperator.validate_operation_string(operation)
-
-    def test_validate_opeartion_string(self):
-        self.assertEqual('valid', self.validate("3 + 4 * 2 + 4 / 5"))
-
-    def test_validate_opeartion_string_not_well_spaced(self):
-        self.assertEqual('valid', self.validate("3 + 4 * 2 + 4 /    5"))
-
-    def test_validate_opeartion_string_unvalid_operator(self):
-        self.assertNotEqual('valid', self.validate("3 + 4 * ? + 4 / 5"))
-
-    def test_validate_opeartion_string_valid_firts_element1(self):
-        self.assertEqual('valid', self.validate("- 3 + 4 * 4 / 5"))
-
-    def test_validate_opeartion_string_valid_firts_element2(self):
-        self.assertEqual('valid', self.validate(" - 3 + 4  + 4 / 5"))
-
-    def test_validate_opeartion_string_unvalid_firts_element1(self):
-        self.assertNotEqual('valid', self.validate("+ 3 / 4 * 5"))
-
-    def test_validate_opeartion_string_unvalid_firts_element2(self):
-        self.assertNotEqual('valid', self.validate("zz 3 / 4 * 5"))
-
-    def test_validate_opeartion_string_unvalid_firts_last_element1(self):
-        self.assertNotEqual('valid', self.validate("3 / 4 * 5 +"))
-
-    def test_validate_opeartion_string_unvalid_firts_last_element2(self):
-        self.assertNotEqual('valid', self.validate("3 / 4 * 5 sdr "))
-
-    def test_validate_opeartion_string_unvalid_operator2(self):
-        self.assertNotEqual('valid', self.validate("3 / 4 z* 5"))
-
-
-class ArithmeticOperatorOperationTest(unittest.TestCase):
-    def test_operate_simple_addition(self):
-        self.assertEqual(ArithmeticOperator.operate("3 + 4"), 7.0)
-
-    def test_operate_simple_addition2(self):
-        self.assertEqual(ArithmeticOperator.operate("3 + 4 - 2"), 5.0)
-
-    def test_operate_simple_multiplication(self):
-        self.assertEqual(ArithmeticOperator.operate("3 * 4 * 2"), 24.0)
-
-    def test_operate_simple_multiplication_and_division(self):
-        self.assertEqual(ArithmeticOperator.operate("12 / 4 * 2"), 6.0)
-
-    def test_operate_division(self):
-        self.assertEqual(ArithmeticOperator.operate("12 / 5 * 2"), 4.8)
-
-    def test_operate_complete_expression1(self):
-        self.assertEqual(ArithmeticOperator.operate("12 / 5 * 2 + 12 - 3 * 2"), 10.8)
-
-    def test_operate_complete_expression2(self):
-        self.assertEqual(ArithmeticOperator.operate("2 * 5 + 20 - 3 * 2"), 24.0)
-
-    def test_operate_complete_expression3(self):
-        self.assertEqual(ArithmeticOperator.operate("-2 * 5 + 20 - 3 * 2"), 4.0)
-
-    def test_operate_complete_expression4(self):
-        self.assertEqual(ArithmeticOperator.operate(" -2 * 5 + 20 - 3 * 2"), 4.0)
-
-    def test_operate_complete_expression5(self):
-        self.assertEqual(ArithmeticOperator.operate(" - 2 * 5 + 20 - 3 * 2"), 4.0)
-
-
-class WrongOperatorFoundException(Exception):
-    pass
 
 
 class ArithmeticOperator:
+    """
+    This class is responsible of the arithmetic calculus and mathematics input
+    validation
+    """
     VALID = 'valid'
-    VALID_CHARSET = '1234567890+-*/ '
+    OPERATORS = '+-*/'
+    VALID_CHARSET = '1234567890 ' + OPERATORS
 
     @staticmethod
     def validate_operation_string(operation_string):
+        """
+        This function checks that all the characters in the input are valid,
+
+        :param operation_string: input string with the operation
+        :type operation_string: str
+        :return: validation message, if is valid string the 'valid'
+        :rtype: str
+        """
         op = operation_string.strip()
         wrong_char_index = -1
+        last_char_is_operator = False
 
         for idx, char in enumerate(operation_string):
+
+            is_operator = char in ArithmeticOperator.OPERATORS
+
+            if last_char_is_operator and is_operator:
+                return 'two consecutive operators found, wrong syntax'
+
             if char not in ArithmeticOperator.VALID_CHARSET:
                 wrong_char_index = idx
                 break
 
+            if char != ' ':
+                last_char_is_operator = is_operator
+
         if wrong_char_index > 0:
-            return 'wrong char, at position %s, not in %s' % (wrong_char_index, ArithmeticOperator.VALID_CHARSET)
+            return 'wrong char, at position %s, not in %s' % (
+                wrong_char_index, ArithmeticOperator.VALID_CHARSET)
 
         if not op[-1].isdigit():
             return 'last element is not valid'
@@ -100,7 +55,15 @@ class ArithmeticOperator:
 
     @staticmethod
     def operate(operation_string):
-        # first separation of assciative terms is needed
+        """
+        This function does the arithmetic operation
+
+        :param operation_string: input string with the operation
+        :type operation_string: str
+        :return: result of the calculus
+        :rtype: float
+        """
+        # first separation of associative terms is needed
         data = operation_string.replace('-', '+-')
         aux, reduction = data.split('+'), []
 
@@ -131,11 +94,10 @@ class ArithmeticOperator:
                     total *= float(buff[idx + 2])
                 elif operator == '/':
                     total /= float(buff[idx + 2])
-                else:
-                    raise WrongOperatorFoundException
+
                 idx += 2
 
-            # and we do the addition of all elemnts once
+            # and we do the addition of all elements once
             # the associative terms have been calculated.
             reduction.append(total)
 
@@ -143,7 +105,15 @@ class ArithmeticOperator:
 
     @staticmethod
     def validate_and_operate(operation_string):
-        validation_msg = ArithmeticOperator.validate_operation_string(operation_string)
+        """
+        Validates the input and does the operation if pass the validation
+
+        :param operation_string: input string with the operation
+        :type operation_string: str
+        :return: result or validation message
+        """
+        validation_msg = ArithmeticOperator.validate_operation_string(
+            operation_string)
 
         if validation_msg == ArithmeticOperator.VALID:
             return ArithmeticOperator.operate(operation_string)
@@ -151,22 +121,45 @@ class ArithmeticOperator:
             return validation_msg
 
 
-class ArithmecticPool:
+class ArithmeticPool:
+    """
+    This class is responsible to split the operations, and create jobs
+    in order to resolve them
+    """
     STOP_PILL = 'stop'
     TERMINATING_MSG = 'end'
 
-    def __init__(self, no_childs, log, validate_operations=True):
-        self.no_childs = no_childs
+    def __init__(self, number_children, log, validate_operations=True):
+        """
+        Initializes the ArithmeticPool
+
+        :param number_children: number o workers to use
+        :type number_children: int
+        :param log: the logger object
+        :type log: logger
+        :param validate_operations: Tells if validation is done
+        :type validate_operations: bool
+        """
+        self.number_children = number_children
         self.log = log
         self.validate_operations = validate_operations
 
     def job(self, i, conn):
+        """
+        Single work unit of the ArithmeticPool class
+
+        :param i: process number
+        :param conn: pipe where the results are delivered
+        :return: None
+        """
         while True:
             (msg, n) = conn.recv()
+            # commented if not outupt is to verbose, uncomment when developing
+            # or debugging
             # self.log.debug("process %s %s  - msgno %s" % (i, msg, n))
 
-            if msg == ArithmecticPool.STOP_PILL:
-                conn.send(ArithmecticPool.TERMINATING_MSG)
+            if msg == ArithmeticPool.STOP_PILL:
+                conn.send(ArithmeticPool.TERMINATING_MSG)
                 self.log.debug("end sent %s" % i)
                 break
             else:
@@ -176,33 +169,53 @@ class ArithmecticPool:
                     else:
                         result = ArithmeticOperator.operate(msg)
 
-                    return_msg = "process[%s] response, input_line[%s]: %s = %s " % (i, n, msg, result)
+                    return_msg = ("process[%s] response, input_line[%s]:"
+                                  " %s = %s ") % (i, n, msg, result)
                     conn.send(return_msg)
                     self.log.debug(return_msg)
 
                 except Exception as ex:
-                    error_msg = "error[%s] response, input_line[%s]: %s = %s " % (i, n, msg, ex)
+                    error_msg = ("error[%s] response, input_line[%s]:"
+                                 " %s = %s ") % (i, n, msg, ex)
                     conn.send(error_msg)
                     self.log.debug(return_msg)
 
     def listener_loop(self, ps, q_out):
+        """
+        Main loop for ArithmeticPool
 
-        while self.no_childs:
+        :param ps: pool of process/workers
+        :param q_out: output queue
+        :return: None
+        """
+        while self.number_children:
             for p in ps:
                 if p[1].poll():
                     msg_in = p[1].recv()
                     self.log.debug(msg_in)
-                    if msg_in.strip() == ArithmecticPool.TERMINATING_MSG:
-                        self.no_childs -= 1
-                        self.log.debug('process %s stopping , left running:%s' % (p[0], self.no_childs))
+                    if msg_in.strip() == ArithmeticPool.TERMINATING_MSG:
+                        self.number_children -= 1
+                        self.log.debug(
+                            'process %s stopping , left running:%s' % (
+                                p[0], self.number_children))
                     else:
                         q_out.put(msg_in)
 
     def pool_processor(self, operations_data):
-        process_list, output_queue = [], multiprocessing.Queue()
+        """
+        Starts ArithmeticPool workers given an input data
 
-        for i in range(self.no_childs):
+        :param operations_data: input with the operations
+        :return: results of the operations
+        """
+        process_list, output_queue = [], multiprocessing.Queue()
+        duplicated_pipes_to_close = []
+
+        for i in range(self.number_children):
             parent_conn, child_conn = multiprocessing.Pipe()
+
+            # this is done because how forking works
+            duplicated_pipes_to_close.append(child_conn)
             p = multiprocessing.Process(target=self.job, args=(i, child_conn,))
             p.daemon = True
             process_list.append((p, parent_conn))
@@ -215,20 +228,19 @@ class ArithmecticPool:
         for process_tuple in process_list:
             process_tuple[0].start()
 
+        for pipe in duplicated_pipes_to_close:
+            pipe.close()
+
         idx = no_messages_sent = 0
 
         for msg in operations_data:
-            idx = idx if idx != self.no_childs else 0
+            idx = idx if idx != self.number_children else 0
             process_list[idx][1].send((msg, no_messages_sent))
             no_messages_sent += 1
-            """
-            self.log.debug(
-                'sending ... to process:%s total_msg_sent:%s / %s' % (idx, no_messages_sent, records_to_process))
-            """
             idx += 1
 
         for process_tuple in process_list:
-            process_tuple[1].send((ArithmecticPool.STOP_PILL, 0))
+            process_tuple[1].send((ArithmeticPool.STOP_PILL, 0))
             self.log.debug('  -> stopping ... %s' % process_tuple[0])
 
         results = []
@@ -237,6 +249,7 @@ class ArithmecticPool:
             element = output_queue.get()
             results.append(element)
 
-        self.log.info(' * work done: operations returned %s - operations sent %s' % (len(results), no_messages_sent))
+        self.log.info((' * work done: operations returned %s - operations '
+                       'sent %s') % (len(results), no_messages_sent))
 
         return results

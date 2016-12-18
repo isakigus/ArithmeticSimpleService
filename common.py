@@ -1,8 +1,10 @@
-import StringIO
+"""
+This module has some utils that can be used in any other
+module of the application.
+"""
+
 import logging
 import time
-import unittest
-
 import py7zlib
 
 wait = time.sleep
@@ -12,30 +14,17 @@ END_SEQUENCE = ('En_un_lugar_de_la_Mancha,_de_cuyo_nombre_no_quiero_acordarme'
                 '_rocin_flaco_y_galgo_corredor')
 
 
-class Test7zip(unittest.TestCase):
-    def test_descompress_7zip_file(self):
-        with open('operations.txt', 'r') as txt_file:
-            content_txt = txt_file.read()
-        path = 'operations.7z'
-        file_content = descompress_7zip_file(path)[0]
-        self.assertEqual(content_txt, file_content)
-
-    def test_descompress_string_format_error(self):
-        resp = StringIO.StringIO('supercalifrastico')
-        try:
-            descompress_7zip_stream(resp)
-        except py7zlib.FormatError:
-            self.assertTrue(True)
-
-    def test_descompress_7zip_stream(self):
-        with open('operations.7z', 'rb') as file7z:
-            stream = file7z.read()
-        resp = StringIO.StringIO(stream)
-        response = descompress_7zip_stream(resp)
-        self.assertTrue(isinstance(response, str))
-
-
 def get_log(name, verbose):
+    """
+    This function return a logger to be used.
+
+    :param name: log name
+    :type name: str
+    :param verbose: Level of output
+    :type verbose: bool
+    :return: logger
+    :rtype: logger object
+    """
     if verbose:
         log_level = logging.DEBUG
     else:
@@ -43,12 +32,19 @@ def get_log(name, verbose):
 
     logging.basicConfig(level=log_level)
     logger = logging.getLogger(name)
+    logger.setLevel(log_level)
     logger.info(' ... logging started ...')
 
     return logger
 
 
-def descompress_7zip_stream(stream):
+def decompress_7zip_stream(stream):
+    """
+    This file decompress a binary stream to a human readable list
+
+    :param stream:
+    :return: None
+    """
     archive, output = py7zlib.Archive7z(stream), []
     for item in archive.getnames():
         data = archive.getmember(item).read()
@@ -57,6 +53,12 @@ def descompress_7zip_stream(stream):
     return output
 
 
-def descompress_7zip_file(file7zname):
-    with open(file7zname, 'rb') as file7zip:
-        return descompress_7zip_stream(file7zip)
+def decompress_7zip_file(file_7z_name):
+    """
+    Decompress a binary file
+
+    :param file_7z_name: name where the compressed files is
+    :return: return a string with the data decompressed from compressed file
+    """
+    with open(file_7z_name, 'rb') as file7zip:
+        return decompress_7zip_stream(file7zip)
