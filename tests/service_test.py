@@ -55,8 +55,6 @@ class TestProcessor(unittest.TestCase):
         self.assertEquals([mock_socket.data_sent], processor.data)
 
 
-class TestArithmeticService(unittest.TestCase):
-    def test_run_it(self):
-        arithmetic_service = ArithmeticService(False, '0.0.0.0', 5555, 2, 1000,
-                                               2)
-        # arithmetic_service.run()
+
+
+

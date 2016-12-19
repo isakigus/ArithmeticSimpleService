@@ -178,7 +178,7 @@ class ArithmeticPool:
                     error_msg = ("error[%s] response, input_line[%s]:"
                                  " %s = %s ") % (i, n, msg, ex)
                     conn.send(error_msg)
-                    self.log.debug(return_msg)
+                    self.log.debug(error_msg)
 
     def listener_loop(self, ps, q_out):
         """
@@ -228,8 +228,11 @@ class ArithmeticPool:
         for process_tuple in process_list:
             process_tuple[0].start()
 
-        for pipe in duplicated_pipes_to_close:
+        """
+                for pipe in duplicated_pipes_to_close:
             pipe.close()
+        """
+
 
         idx = no_messages_sent = 0
 
